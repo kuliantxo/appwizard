@@ -1,0 +1,174 @@
+<!doctype html>
+<html class="no-js" lang="" ng-app="AppWizard">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>AppWizard</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link type="text/css" rel="stylesheet" href="css/animate.css">
+
+
+</head>
+<body ng-controller="AppCtrl">
+<div class="{{ pageName }}-page">
+    <div class="container">
+        <div ng-view></div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="embedded.home.html">
+<div class="appshomepage">
+    <div class="wizard_wrap home_screen animated slideInDown">
+
+       <a class="btn btn-default btn-block btn-l home_btn "  href="#/question/quest1" > Discover QuickBooks Apps   </a>
+        <a href="#/apps" > <span class="close_wizard"> </span></a>
+        <h1> Hey there!</h1>
+        <p> I am the App Wizard.</p>
+        <p> By answering a few questions, I will find the best QuickBooks Apps for you. </p>
+
+    </div>
+</div>
+</script>
+
+
+<script type="text/ng-template" id="embedded.apps.html">
+    <div class="appshomepage"> </div>
+    <!-- <a href="#/question/who" class="btn btn-default btn-block btn-lg">Questions</a> -->
+</script>
+<script type="text/ng-template" id="embedded.question.html">
+
+	<div class="question-wrapper animated fadeIn">
+	    <h1>{{ questions[selected].q }}</h1>
+	    <div class="row">
+	    	<div class="col-xs-6" ng-repeat="question in questions[selected].a">
+			    <a ng-href="{{ getUrl(question) }}" class="btn btn-default btn-block btn-lg">{{ question.value }}</a>
+	    	</div>
+	    </div>
+	</div>
+
+  
+
+</script>
+
+
+
+<script type="text/ng-template" id="embedded.collection.html">
+    <h2>{{ collections[selected].msg }}</h2>
+    <div class="panel-group animated " id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default" ng-init="emailDone = []" ng-repeat="(k, v) in collections[selected].apps">
+            <div class="panel-heading" role="tab" id="heading{{ k }}">
+                <h4 class="panel-title">
+                    <div data-toggle="collapse" data-parent="#accordion" data-target="#{{ k }}" aria-controls="{{ k }}">
+                    	<div class="media">
+						  <div class="media-left">
+						    <a href="#">
+						      <img class="media-object" ng-src="{{ v.icon }}" alt="...">
+						    </a>
+						  </div>
+						  <div class="media-body">
+						    <h4 class="media-heading">{{ v.name }}</h4>
+						    <p>{{ v.tagline }}</p>
+						  </div>
+						</div>
+                    </div>
+                </h4>
+            </div>
+            <div id="{{ k }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ k }}">
+                <div class="panel-body appdetails">
+                    <img class="stars" ng-src="images/stars.png">
+
+                    <div class="pricing">{{ v.pricing }}</div>
+
+                    <div class="video_wrap"> <img height="60px;" ng-src="images/video_play_icon_small.png"></div>
+                    <h4> Description:</h4>
+                    <p style="padding-bottom:5px;">{{ v.description }}</p>
+
+                    <h4> Review:</h4>
+                    <p>{{ v.review }}</p>
+                    <div class="text-center"><!-- Button trigger modal -->
+                        <button type="button" class="btn btn-default email_btn" data-toggle="modal" data-target="#emailModal{{ k }}">
+                          Email Me This App
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Modal -->
+            <div class="modal fade" id="emailModal{{ k }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header" style="border-bottom: 0px solid black">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel" hidden="true">Modal title</h4>
+                  </div>
+                  <div class="modal-body text-center" ng-hide="emailDone[k]">
+                    <p class="lead">
+                        Enter your email.<br>
+                    </p><p class="lead">
+                        I will send you more information about {{ v.name }} and help you get started.<br>
+                    </p>
+                    <!-- <form ng-submit="emailDone[k] = true"> -->
+                    <form ng-submit="emailDone[k] = true" method="POST" action="https://api:key-41cb6ca5f8920704bd059e35d95b1a63@api.mailgun.net/v3/sandboxca6215b47b7045eaa1dab4024185d0ce.mailgun.org/messages" target="_blank">
+                        <input type="hidden" name="from" value="The App Wizard <postmaster@sandboxca6215b47b7045eaa1dab4024185d0ce.mailgun.org>">
+                        <input type="hidden" name="to" value="{{ $parent.email }}">
+                        <input type="hidden" name="subject" value="Information about {{ v.name }}">
+                        <input type="hidden" name="html" value="Hi there,<br><br>Thanks for showing interest in {{ v.name }}!<br><br><b>{{ v.name }}</b><br><i>{{ v.tagline }}</i><br><p>{{ v.description }}</p><p>{{ v.pricing }}</p><a href='http://apps.com'>Click here</a> to connect to {{ v.name }} today!<br><br>- The App Wizard<br><img src='http://cdn.thebasementwizard.com/images/wizard.png'>">
+                        <div class="form-group">
+                            <input type="text" class="form-control" ng-model="$parent.email" placeholder="you@email.com" />
+                        </div>
+                        <button type="submit" class="btn btn-default">Submit</button>
+                    </form>
+                  </div>
+                  <div class="modal-body text-center" ng-show="emailDone[k]">
+                    <p class="lead">
+                        Your email is on its way!
+                    </p><p class="lead">
+                        In the meantime, let’s find more apps.
+                    </p>
+
+                    <button type="button" class="btn btn-success" data-dismiss="modal" data-toggle="collapse" data-target="#{{ k }}">Keep Browsing</button>
+                  </div>
+                  <div class="modal-footer" hidden="true"></div>
+                </div>
+              </div>
+            </div>
+
+        </div>
+
+        <br>
+        <div class="text-center">
+            <a href="#/question/{{ collections[selected].next }}"> <button type="button" style="font-size:130%" class="btn btn-success" ng-click="">Discover More Apps</button></a>
+        </div>
+    </div>
+
+</script>
+
+
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<script src="js/angular.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+$(document).ready(function(){
+
+    $('#accordion').on('show.bs.collapse', function (e) {
+        // do something…
+
+        var elm = e.target.id;
+
+        $("#"+elm).animate({
+            scrollTop: 0
+        }, 600);
+    })
+
+})
+
+</script>
+</body>
+</html>
